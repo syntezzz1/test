@@ -12,7 +12,7 @@ services:
     networks:
       - mynetwork
     volumes:
-      - /home/vstarkov/Pictures/my-apps-docker/postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
 
   tasks:
     build:
