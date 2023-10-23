@@ -1,3 +1,13 @@
+## Создание директории
+
+```bash
+mkdir postgres_data
+```
+
+```bash
+sudo chown -R 1001:0 postgres_data
+```
+
 # Запуск через docker compose
 
 1. Собираем композ:
