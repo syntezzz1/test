@@ -1,0 +1,51 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: star_postgres
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+    volumes:
+      - /home/vstarkov/Pictures/my-apps-docker/postgres_data:/var/lib/postgresql/data
+
+  tasks:
+    build:
+      context: ./tasks  
+    container_name: star_tasks
+    ports:
+      - "5050:5050"
+    networks:
+      - mynetwork
+    depends_on:
+      - postgres
+    environment:
+      WORKER_HOST: star_worker
+      WORKER_PORT: 5051
+      PSQL_NAME: star_postgres
+
+  worker:
+    build:
+      context: ./worker  
+    container_name: star_worker
+    ports:
+      - "5051:5051"
+    networks:
+      - mynetwork
+    depends_on:
+      - postgres
+    environment:
+      WORKER_HOST: star_worker
+      WORKER_PORT: 5051
+      PSQL_NAME: star_postgres
+
+networks:
+  mynetwork:
+
+volumes:
+  postgres_data:
