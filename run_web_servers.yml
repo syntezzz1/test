@@ -1,0 +1,67 @@
+---
+- name: install and configure apache and nginx on debian and centos
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: allow traffic on ports 80 and 8080 on centos
+      firewalld:
+        port: "{{ item }}/tcp"
+        zone: public
+        state: enabled
+      with_items:
+        - 80
+        - 8080
+      when: ansible_os_family == 'RedHat'
+      
+    - name: install apache
+      package:
+        name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+        state: present
+        
+    - name: start apache service
+      service:
+        name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+        state: started
+
+    # nginx is missing on centos default repo
+    - name: configure repo for nginx on centos
+      block:
+        - name: create nginx repo file on centos
+          file:
+            path: /etc/yum.repos.d/nginx.repo
+            state: touch
+          when: ansible_os_family == 'RedHat'
+
+        - name: add nginx repo to centos
+          blockinfile:
+            path: /etc/yum.repos.d/nginx.repo
+            block: |
+              [nginx-stable]
+              name=nginx stable repo
+              baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+              gpgcheck=1
+              enabled=1
+              gpgkey=https://nginx.org/keys/nginx_signing.key
+              module_hotfixes=true
+          when: ansible_os_family == 'RedHat'
+
+    - name: install nginx
+      package:
+        name: nginx
+        state: present
+      
+    - name: setup config and run nginx
+      block:
+      - name: copy custom nginx config file
+      # copy `default_nginx_config` content to config corresponding to the OS
+      # you can use `template` module to copy content with using a template
+        template:
+          src: default_nginx_config
+          dest: "{{ '/etc/nginx/conf.d/default.conf' if ansible_os_family == 'RedHat' else '/etc/nginx/sites-available/default' }}"
+
+      - name: start nginx service
+        service:
+          name: nginx
+          state: started
