@@ -1,7 +1,10 @@
 ---
 - name: install and configure apache and nginx on debian and centos
+  # perform tasks on all hosts
   hosts: all
+  # use sudo
   become: true
+  # get some info about hosts (os family)
   gather_facts: true
 
   tasks:
