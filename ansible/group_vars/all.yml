@@ -1,0 +1,14 @@
+# ------------------------------------------------------------------------------------------------------------------
+# Web root dir
+WEB_ROOT: /srv/www
+# ------------------------------------------------------------------------------------------------------------------
+
+# NGINX balancer port
+NGINX_PORT: 8080
+# Apache port
+APACHE_PORT: 80
+
+# Package names
+PACKAGE_NAME: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+
+CONFIG_DESTINATION: "{{ '/etc/nginx/conf.d/default.conf' if ansible_os_family == 'RedHat' else '/etc/nginx/sites-available/default' }}"

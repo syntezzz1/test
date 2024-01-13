@@ -1,0 +1,10 @@
+---
+- name: install and configure apache and nginx on debian and centos
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - os_configuration/security
+    - delivery/apache
+    - delivery/nginx

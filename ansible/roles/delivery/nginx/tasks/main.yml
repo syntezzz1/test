@@ -1,0 +1,42 @@
+- name: Configure repo for nginx on centos
+  block:
+    - name: Check if nginx repo file exists on centos
+      stat:
+        path: /etc/yum.repos.d/nginx.repo
+      register: nginx_repo_check
+      when: ansible_os_family == 'RedHat'
+    - name: Create nginx repo file on centos
+      file:
+        path: /etc/yum.repos.d/nginx.repo
+        state: touch
+      when: ansible_os_family == 'RedHat'
+
+    - name: Add nginx repo to centos
+      blockinfile:
+        path: /etc/yum.repos.d/nginx.repo
+        block: |
+          [nginx-stable]
+          name=nginx stable repo
+          baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+          gpgcheck=1
+          enabled=1
+          gpgkey=https://nginx.org/keys/nginx_signing.key
+          module_hotfixes=true
+      when: ansible_os_family == 'RedHat'
+
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Setup config and run nginx
+  block:
+    - name: Copy custom nginx config file
+      template:
+        src: conf_templates/nginx_config.j2
+        dest: "{{ CONFIG_DESTINATION }}"
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started

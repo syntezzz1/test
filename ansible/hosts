@@ -1,5 +1,3 @@
-
-
 [web_servers]
 centos_server ansible_host=<centos_ip_addr> ansible_user=root
 debian_server ansible_host=<debian_ip_addr> ansible_user=<debian_user>
