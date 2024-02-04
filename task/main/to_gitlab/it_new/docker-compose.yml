@@ -1,0 +1,28 @@
+version: "2.4"
+
+services:
+  nginx:
+    image: localhost:5000/nginx-image:0.0.1
+    hostname: front-nginx
+    restart: unless-stopped
+    ports:
+      - ${API_PORT}:80
+    environment:
+      API_PORT: ${API_PORT}
+    depends_on:
+      - upstream-debian
+      - upstream-centos
+
+  upstream-centos:
+    image: localhost:5000/centos-image:0.0.1
+    volumes:
+        - ./single_page:/var/www/html
+    hostname: upstream
+    restart: unless-stopped
+
+  upstream-debian:
+    image: localhost:5000/debian-image:0.0.1
+    volumes:
+        - ./single_page:/var/www/html
+    hostname: upstream
+    restart: unless-stopped
