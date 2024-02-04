@@ -1,0 +1,16 @@
+version: '3'
+services:
+  gitlab-runner:
+    image: 'gitlab/${GITLAB_RUNNER_VERSION}'
+    restart: unless-stopped
+    network_mode: host
+    hostname: gitlab-runner
+    # debugging on localhost
+    # extra_hosts:
+    #   example.local: 127.0.0.1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '${GITLAB_RUNNER_CONF_DIR}:/etc/gitlab-runner'
+      #- '${GITLAB_RUNNER_DATA_DIR}:/home/gitlab-runner'
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock

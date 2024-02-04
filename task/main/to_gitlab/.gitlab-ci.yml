@@ -1,0 +1,33 @@
+stages:
+  - build_images
+
+build_images:
+  stage: build_images
+  tags: ['main-tag']
+  script:
+
+  # build images
+  - docker build -t debian-image:0.0.1 ./it_new/debian
+  - docker build -t centos-image:0.0.1 ./it_new/centos
+  - docker build -t nginx-image:0.0.1 ./it_new/nginx
+
+  - docker images
+
+  # push images
+
+  - docker login -u root -p root localhost:5000
+
+  - docker tag debian-image:0.0.1 localhost:5000/debian-image:0.0.1
+  - docker push localhost:5000/debian-image:0.0.1
+
+  - docker tag centos-image:0.0.1 localhost:5000/centos-image:0.0.1
+  - docker push localhost:5000/centos-image:0.0.1
+
+  - docker tag nginx-image:0.0.1 localhost:5000/nginx-image:0.0.1
+  - docker push localhost:5000/nginx-image:0.0.1
+  artifacts:
+    expire_in: "1 hrs"
+    paths:
+      - it_new
+      - it_new/.env
+

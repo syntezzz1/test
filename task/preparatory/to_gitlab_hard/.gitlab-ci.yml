@@ -1,0 +1,38 @@
+default:
+  image: example.local:5000/ubuntu:custom
+
+stages:
+- build
+- test
+
+build:
+  stage: build
+  tags: ["test-tag"]
+
+  script:
+    - apt update -y
+    - apt install -y gcc g++ make cmake
+
+    - mkdir build
+    - mkdir install
+    - cd build
+    - cmake ../ 
+    - make -j 10
+    - make DESTDIR=../install  install
+
+    - cd ${CI_PROJECT_DIR}
+    - mv install/usr/local/bin/test_app .
+
+  artifacts:
+    name: "test_app"
+    paths:
+      - test_app
+
+test:
+  stage: test  
+  tags: ["test-tag"]
+  variables:
+    GIT_STRATEGY: none
+  
+  script:
+    - ./test_app
